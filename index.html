@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <!-- OG META TAGS (Preview saat Share Link) -->
+  <meta property="og:title" content="FOMFA AI - Asisten Cerdas">
+  <meta property="og:description" content="Asisten AI cerdas untuk membantu pikiran mendalam dan tugas Anda.">
+  <meta property="og:type" content="website">
+  <!-- GANTI URL INI SETELAH PUBLISH -->
+  <meta property="og:url" content="https://your-website-url.com">
+  <meta property="og:image" content="https://your-website-url.com/logo-preview.png">
+  
+  <title>FOMFA AI</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;500;600;700;800;900&family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-base: #fffbf5;
+      --glass-white: rgba(255, 255, 255, 0.55);
+      --glass-border: rgba(255, 255, 255, 0.65);
+      --text-dark: #1c1917;
+      --text-muted: #78716c;
+      --orange-main: #dc2626;
+      --orange-light: #f87171;
+      --blue-main: #2563eb;
+      --blue-light: #60a5fa;
+      --overlay-bg: rgba(0, 0, 0, 0.3);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body { font-family: 'Manrope', sans-serif; background: var(--bg-base); color: var(--text-dark); min-height: 100vh; overflow-x: hidden; }
+    .font-display { font-family: 'Lexend', sans-serif; }
+
+    /* Background Effects */
+    .bg-layer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; background: radial-gradient(ellipse 70% 50% at 15% 5%, rgba(252, 165, 165, 0.38) 0%, transparent 55%), radial-gradient(ellipse 55% 40% at 85% 95%, rgba(147, 197, 253, 0.38) 0%, transparent 55%); }
+    .floating-shape { position: absolute; border-radius: 50%; filter: blur(90px); animation: floatShape 28s ease-in-out infinite; }
+    .shape-1 { width: 400px; height: 400px; background: linear-gradient(135deg, rgba(248, 113, 113, 0.32), rgba(254, 202, 202, 0.22)); top: -120px; right: -60px; }
+    .shape-2 { width: 350px; height: 350px; background: linear-gradient(135deg, rgba(96, 165, 250, 0.28), rgba(191, 219, 254, 0.18)); bottom: -60px; left: -60px; animation-delay: -10s; }
+    @keyframes floatShape { 0%, 100% { transform: translate(0, 0); } 50% { transform: translate(20px, -20px); } }
+
+    /* Intro */
+    #intro-screen { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 10000; display: flex; align-items: center; justify-content: center; flex-direction: column; text-align: center; background: radial-gradient(ellipse 60% 50% at 25% 15%, rgba(254, 202, 202, 0.42) 0%, transparent 55%), radial-gradient(ellipse 50% 40% at 75% 85%, rgba(191, 219, 254, 0.42) 0%, transparent 55%), var(--bg-base); transition: opacity 0.5s; }
+    .intro-content { text-align: center; padding: 2rem; }
+    .intro-logo { width: 105px; height: 105px; margin: 0 auto 1.5rem; background: linear-gradient(135deg, #fff0f3 0%, #dbeafe 100%); backdrop-filter: blur(24px); border-radius: 30px; border: 1px solid rgba(255,255,255,0.6); display: flex; align-items: center; justify-content: center; opacity: 0; transform: scale(0.75); animation: logoReveal 0.85s cubic-bezier(0.34, 1.56, 0.64, 1) 0.25s forwards; box-shadow: 0 10px 30px rgba(220, 38, 38, 0.1); }
+    @keyframes logoReveal { to { opacity: 1; transform: scale(1); } }
+    .intro-logo svg { width: 58px; height: 58px; }
+    .intro-title { font-size: clamp(2.2rem, 9vw, 3.2rem); font-weight: 800; margin-bottom: 0.75rem; opacity: 0; animation: textReveal 0.55s ease-out 0.65s forwards; }
+    .intro-subtitle { font-size: 0.9rem; font-weight: 600; color: var(--text-muted); letter-spacing: 0.14em; text-transform: uppercase; opacity: 0; animation: textReveal 0.55s ease-out 0.9s forwards; }
+    @keyframes textReveal { to { opacity: 1; transform: translateY(0); } }
+    .intro-loader { width: 170px; height: 4px; background: rgba(0,0,0,0.06); border-radius: 4px; margin: 1.5rem auto 0; overflow: hidden; opacity: 0; animation: textReveal 0.4s ease-out 1.15s forwards; }
+    .intro-loader-fill { height: 100%; width: 0; background: linear-gradient(90deg, var(--orange-main), var(--orange-light), var(--blue-light), var(--blue-main)); border-radius: 4px; animation: loadProgress 1.5s ease-out 1.35s forwards; }
+    @keyframes loadProgress { to { width: 100%; } }
+    .intro-hide { opacity: 0; pointer-events: none; }
+
+    /* Main App */
+    #main-app { position: relative; z-index: 1; min-height: 100vh; opacity: 0; visibility: hidden; display: flex; flex-direction: column; }
+    .main-visible { animation: mainReveal 0.5s ease forwards; }
+    @keyframes mainReveal { to { opacity: 1; visibility: visible; } }
+
+    /* Header */
+    .header { position: fixed; top: 0; left: 0; right: 0; z-index: 100; padding: 0.875rem 1.25rem; }
+    .header-inner { max-width: 720px; margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1.25rem; background: linear-gradient(135deg, rgba(255,255,255,0.82), rgba(255,255,255,0.68)); backdrop-filter: blur(26px); border-radius: 100px; border: 1px solid rgba(255,255,255,0.78); box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05); }
+    .header-logo { display: flex; align-items: center; gap: 0.75rem; }
+    .logo-box { width: 36px; height: 36px; background: linear-gradient(135deg, var(--orange-main), var(--orange-light)); border-radius: 11px; display: flex; align-items: center; justify-content: center; box-shadow: 0 3px 10px rgba(220, 38, 38, 0.25); flex-shrink: 0; }
+    .logo-box svg { width: 20px; height: 20px; }
+    .brand-name { font-size: 1.25rem; font-weight: 800; background: linear-gradient(135deg, var(--orange-main), var(--orange-light)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+    
+    .sidebar-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--overlay-bg); z-index: 200; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
+    .sidebar-overlay.active { opacity: 1; pointer-events: auto; }
+    .sidebar-panel { position: fixed; top: 0; left: 0; width: 300px; height: 100%; background: var(--bg-base); z-index: 201; transform: translateX(-100%); transition: transform 0.3s ease; border-right: 1px solid var(--glass-border); display: flex; flex-direction: column; }
+    .sidebar-panel.active { transform: translateX(0); }
+    .sidebar-header { padding: 1.5rem 1.25rem 1rem; border-bottom: 1px solid rgba(0,0,0,0.05); display: flex; justify-content: space-between; align-items: center; }
+    .sidebar-title { font-size: 1rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.05em; }
+    .history-list { flex: 1; overflow-y: auto; padding: 0.5rem; }
+    .history-item { padding: 0.875rem 1rem; margin-bottom: 0.5rem; background: rgba(255,255,255,0.6); border-radius: 12px; cursor: pointer; transition: all 0.2s ease; border: 1px solid transparent; }
+    .history-item:hover { background: rgba(255,255,255,0.85); border-color: var(--orange-light); transform: translateX(4px); }
+    .history-item.active { background: rgba(220, 38, 38, 0.08); border-color: var(--orange-main); }
+    .history-item-title { font-size: 0.9rem; font-weight: 600; margin-bottom: 0.25rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .history-item-date { font-size: 0.7rem; color: var(--text-muted); }
+
+    .header-actions { display: flex; gap: 0.5rem; }
+    .btn-icon { width: 36px; height: 36px; border-radius: 50%; border: 1px solid rgba(220, 38, 38, 0.15); background: rgba(220, 38, 38, 0.06); color: var(--orange-main); cursor: pointer; transition: all 0.2s ease; display: flex; align-items: center; justify-content: center; }
+    .btn-icon:hover { background: rgba(220, 38, 38, 0.12); transform: scale(1.05); }
+    .btn-icon svg { width: 18px; height: 18px; }
+
+    /* Main Content */
+    .main-content { flex: 1; max-width: 720px; width: 100%; margin: 0 auto; padding: 78px 1rem 160px; display: flex; flex-direction: column; position: relative; }
+    .main-content::before { content: ''; position: absolute; top: 0; left: 0; right: 0; height: 250px; background: linear-gradient(180deg, rgba(255, 235, 238, 0.5) 0%, rgba(219, 234, 254, 0.3) 50%, transparent 100%); pointer-events: none; z-index: -1; }
+
+    .welcome { text-align: center; padding: 0.5rem 0.5rem 1.5rem; animation: fadeIn 0.5s ease; }
+    .welcome-title { font-size: clamp(1.4rem, 5vw, 1.85rem); font-weight: 800; line-height: 1.2; margin-bottom: 0.4rem; }
+    .welcome-desc { font-size: 0.85rem; color: var(--text-muted); font-weight: 500; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
+
+    .messages-wrap { flex: 1; display: flex; flex-direction: column; gap: 0.875rem; padding-top: 1.5rem; }
+    .msg { max-width: 76%; padding: 0.875rem 1.15rem; border-radius: 20px; animation: msgSlide 0.3s cubic-bezier(0.34, 1.56, 0.64, 1); position: relative; }
+    @keyframes msgSlide { from { opacity: 0; transform: translateY(10px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+    .msg-user { margin-left: auto; background: linear-gradient(135deg, var(--orange-main), var(--orange-light)); color: white; border-bottom-right-radius: 6px; box-shadow: 0 3px 14px rgba(220, 38, 38, 0.2); }
+    .msg-ai, .msg-assistant { margin-right: auto; background: linear-gradient(135deg, rgba(255,255,255,0.90), rgba(255,255,255,0.75)); backdrop-filter: blur(22px); border: 1px solid rgba(255,255,255,0.72); border-bottom-left-radius: 6px; box-shadow: 0 3px 14px rgba(0, 0, 0, 0.04); }
+    .msg-label { font-size: 0.62rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.09em; margin-bottom: 0.3rem; opacity: 0.72; }
+    .msg-text { font-size: 0.92rem; font-weight: 500; line-height: 1.58; white-space: pre-wrap; padding-right: 24px; }
+
+    /* Copy Button */
+    .copy-btn { position: absolute; bottom: 6px; right: 8px; width: 18px; height: 18px; border: none; background: transparent; cursor: pointer; opacity: 0; transition: opacity 0.2s; padding: 0; display: flex; align-items: center; justify-content: center; color: inherit; }
+    .msg:hover .copy-btn { opacity: 0.5; }
+    .copy-btn:hover { opacity: 1 !important; transform: scale(1.15); }
+    .msg-user .copy-btn { color: rgba(255,255,255,0.8); }
+    .msg-ai .copy-btn { color: rgba(0,0,0,0.4); }
+    .copy-btn svg { width: 14px; height: 14px; pointer-events: none; }
+
+    .typing-box { display: flex; align-items: center; gap: 0.45rem; color: var(--text-muted); font-size: 0.8rem; font-weight: 500; }
+    .typing-dots { display: flex; gap: 3.5px; }
+    .typing-dot { width: 6px; height: 6px; background: linear-gradient(135deg, var(--orange-main), var(--orange-light)); border-radius: 50%; animation: dotPulse 0.9s ease-in-out infinite; }
+    .typing-dot:nth-child(2) { animation-delay: 0.1s; }
+    .typing-dot:nth-child(3) { animation-delay: 0.2s; }
+    @keyframes dotPulse { 0%, 100% { transform: scale(0.75); opacity: 0.45; } 50% { transform: scale(1.15); opacity: 1; } }
+
+    /* Input Area */
+    .input-area { position: fixed; bottom: 0; left: 0; right: 0; padding: 1rem 1rem 60px; background: linear-gradient(to top, var(--bg-base) 100px, transparent); z-index: 50; }
+    .input-box { max-width: 720px; margin: 0 auto; display: flex; gap: 0.65rem; align-items: flex-end; }
+    .input-field { flex: 1; padding: 0.6rem 1rem; background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(255,255,255,0.7)); backdrop-filter: blur(26px); border: 1px solid rgba(255,255,255,0.78); border-radius: 22px; box-shadow: 0 3px 16px rgba(0, 0, 0, 0.045); cursor: text; min-height: 48px; display: flex; align-items: center; }
+    textarea { width: 100%; background: transparent; border: none; outline: none; font-family: inherit; font-size: 0.9rem; font-weight: 500; color: var(--text-dark); resize: none; max-height: 80px; line-height: 1.4; padding: 4px 0; }
+    .btn-send { width: 48px; height: 48px; border-radius: 16px; border: none; background: linear-gradient(135deg, var(--orange-main), var(--orange-light)); color: white; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: transform 0.18s ease, box-shadow 0.18s ease; box-shadow: 0 3px 14px rgba(220, 38, 38, 0.28); }
+    .btn-send:hover { transform: translateY(-1.5px); box-shadow: 0 5px 20px rgba(220, 38, 38, 0.35); }
+    .btn-send:active { transform: translateY(0); }
+    .btn-send:disabled { opacity: 0.5; cursor: not-allowed; transform: none; }
+    
+    .footer { position: fixed; bottom: 0; left: 0; right: 0; height: auto; padding: 12px 10px; display: flex; align-items: center; justify-content: center; background: rgba(255, 255, 255, 0.98); backdrop-filter: blur(10px); border-top: 1px solid rgba(0, 0, 0, 0.1); z-index: 60; font-size: 0.55rem; font-family: 'Lexend', sans-serif; font-weight: 700; flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; text-transform: uppercase; letter-spacing: 0.5px; }
+    .footer-text { background: linear-gradient(90deg, #0f172a 0%, #2563eb 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; color: #0f172a; }
+
+    ::-webkit-scrollbar { width: 5px; height: 2px; }
+    ::-webkit-scrollbar-track { background: transparent; }
+    ::-webkit-scrollbar-thumb { background: linear-gradient(180deg, var(--orange-light), var(--blue-light)); border-radius: 5px; }
+  </style>
+</head>
+<body>
+  <div class="bg-layer"><div class="bg-gradient"></div><div class="floating-shape shape-1"></div><div class="floating-shape shape-2"></div></div>
+
+  <div id="intro-screen">
+    <div class="intro-content">
+      <div class="intro-logo"><svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="26" stroke="#dc2626" stroke-width="3.5" fill="none"/><circle cx="50" cy="50" r="11" fill="#dc2626"/><circle cx="32" cy="38" r="6" fill="#2563eb"/><circle cx="68" cy="38" r="6" fill="#2563eb"/><circle cx="32" cy="62" r="6" fill="#2563eb"/><circle cx="68" cy="62" r="6" fill="#2563eb"/><line x1="37" y1="40.5" x2="43" y2="44" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/><line x1="63" y1="40.5" x2="57" y2="44" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/><line x1="37" y1="59.5" x2="43" y2="56" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/><line x1="63" y1="59.5" x2="57" y2="56" stroke="#dc2626" stroke-width="3" stroke-linecap="round"/></svg></div>
+      <h1 class="intro-title font-display">FOMFA AI</h1>
+      <p class="intro-subtitle">Artificial Intelligence for Deep Thinking</p>
+      <div class="intro-loader"><div class="intro-loader-fill"></div></div>
+    </div>
+  </div>
+
+  <div class="sidebar-overlay" id="sidebarOverlay"></div>
+  <div class="sidebar-panel" id="sidebarPanel">
+    <div class="sidebar-header">
+      <span class="sidebar-title font-display">Riwayat Chat</span>
+      <button class="btn-icon" id="btnCloseSidebar"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M6 18L18 6M6 6l12 12"/></svg></button>
+    </div>
+    <div class="history-list" id="historyList"></div>
+  </div>
+
+  <div id="main-app">
+    <header class="header">
+      <div class="header-inner">
+        <div class="header-logo"><div class="logo-box"><svg viewBox="0 0 100 100" fill="none"><circle cx="50" cy="50" r="24" stroke="white" stroke-width="3" fill="none"/><circle cx="50" cy="50" r="9" fill="white"/></svg></div><span class="brand-name font-display">FOMFA AI</span></div>
+        <div class="header-actions">
+          <button class="btn-icon" id="btnMenu" title="Riwayat"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M3 12h18M3 6h18M3 18h18"/></svg></button>
+          <button class="btn-icon" id="btnNewChat" title="Baru"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+        </div>
+      </div>
+    </header>
+
+    <main class="main-content">
+      <div class="welcome" id="welcome"><h2 class="welcome-title font-display">Halo, ada yang bisa dibantu?</h2><p class="welcome-desc">Saya FOMFA AI, asisten cerdas yang siap membantu Anda.</p></div>
+      <div class="messages-wrap" id="messages"></div>
+    </main>
+
+    <div class="input-area">
+      <div class="input-box">
+        <div class="input-field" onclick="document.getElementById('txtInput').focus()">
+          <textarea id="txtInput" placeholder="Ketik pesan..." rows="1"></textarea>
+        </div>
+        <button class="btn-send" id="btnSend"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg></button>
+      </div>
+    </div>
+
+    <footer class="footer">
+        <span class="footer-text">Dev: Gabriel • Partner: Maru, Sahrul, Dimas • Sponsor: FOMFA CIRCLE</span>
+    </footer>
+  </div>
+
+  <script>
+    // === KONFIG ===
+    const URL = 'https://ewbupmakfcsipwhvfdhq.supabase.co/functions/v1/fomfa-ai';
+    const KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImV3YnVwbWFrZmNzaXB3aHZmZGhxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzE1ODY3NzEsImV4cCI6MjA4NzE2Mjc3MX0.pEf7R8QOH50kEw6PgYA6Rwlu7nLHfrpGHjfEzjISLLg';
+
+    let sesId = null;
+    let msgs = [];
+    let procs = false;
+    let audioCtx = null;
+
+    // === HELPERS ===
+    const $ = id => document.getElementById(id);
+    const esc = s => { let d = document.createElement('div'); d.textContent = s; return d.innerHTML; };
+
+    // === SOUND EFFECTS ===
+    function initAudio() { if (!audioCtx) { audioCtx = new (window.AudioContext || window.webkitAudioContext)(); } }
+
+    function playSound(type) {
+      initAudio();
+      if (audioCtx.state === 'suspended') audioCtx.resume();
+      const now = audioCtx.currentTime;
+      const vol = 0.5;
+
+      const playNote = (freq, startTime, duration, type = 'sine', volume = vol) => {
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.type = type;
+        osc.frequency.value = freq;
+        gain.gain.setValueAtTime(volume, now + startTime);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + startTime + duration);
+        osc.start(now + startTime);
+        osc.stop(now + startTime + duration);
+      };
+
+      if (type === 'intro') {
+        [523.25, 659.25, 783.99, 1046.50].forEach((f, i) => { playNote(f, i * 0.11, 0.55, 'sine', 0.4); });
+        [1046.50, 1318.51, 1567.98, 2093.00].forEach((f, i) => { playNote(f, i * 0.11, 0.45, 'triangle', 0.15); });
+        return;
+      }
+
+      if (type === 'click') { playNote(800, 0, 0.06, 'sine', 0.3); playNote(400, 0.01, 0.06, 'triangle', 0.2); } 
+      else if (type === 'send') {
+        const osc = audioCtx.createOscillator(); const gain = audioCtx.createGain();
+        osc.connect(gain); gain.connect(audioCtx.destination);
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(150, now); osc.frequency.exponentialRampToValueAtTime(1200, now + 0.08);
+        gain.gain.setValueAtTime(0.4, now); gain.gain.exponentialRampToValueAtTime(0.001, now + 0.15);
+        osc.start(now); osc.stop(now + 0.15);
+      } 
+      else if (type === 'receive') {
+        playNote(1046.50, 0, 0.25, 'sine', 0.35); 
+        playNote(1318.51, 0.08, 0.35, 'sine', 0.3); 
+        playNote(2093.00, 0.08, 0.15, 'triangle', 0.1);
+      }
+    }
+
+    async function api(act, pay = {}) {
+      try {
+        const r = await fetch(URL, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': KEY, 'Authorization': 'Bearer ' + KEY },
+          body: JSON.stringify({ action: act, ...pay })
+        });
+        return r.json();
+      } catch (e) { return { error: e.message }; }
+    }
+
+    // === FUNGSI UTAMA ===
+    async function loadHist() {
+      const d = await api('get_history');
+      if (d.sessions) {
+        const h = $('historyList');
+        h.innerHTML = '';
+        if (!d.sessions.length) { h.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-muted);font-size:0.8rem;">Belum ada riwayat</div>'; return; }
+        d.sessions.forEach(s => {
+          const el = document.createElement('div');
+          el.className = 'history-item' + (s.id === sesId ? ' active' : '');
+          el.onclick = () => loadSes(s.id);
+          el.innerHTML = '<div class="history-item-title">' + esc(s.title || 'Chat') + '</div><div class="history-item-date">' + new Date(s.created_at).toLocaleDateString('id-ID') + '</div>';
+          h.appendChild(el);
+        });
+      }
+    }
+
+    async function startNewChat() {
+      playSound('click');
+      const d = await api('new_session');
+      if (d.session_id) {
+        sesId = d.sessionId; msgs = [];
+        $('messages').innerHTML = '';
+        $('welcome').style.display = 'block';
+        toggleSidebar(false);
+        loadHist();
+      }
+    }
+
+    async function loadSes(id) {
+      playSound('click');
+      toggleSidebar(false);
+      sesId = id;
+      const d = await api('get_messages', { session_id: id });
+      msgs = d.messages || [];
+      render();
+      $('welcome').style.display = 'none';
+    }
+
+    async function sendMessage() {
+      const txt = $('txtInput').value.trim();
+      if (!txt || procs) return;
+      
+      procs = true;
+      playSound('send'); 
+      $('welcome').style.display = 'none';
+      
+      msgs.push({ role: 'user', content: txt });
+      render();
+      $('txtInput').value = '';
+      $('txtInput').style.height = 'auto';
+      
+      const tId = 't' + Date.now();
+      const tDiv = document.createElement('div');
+      tDiv.id = tId;
+      tDiv.className = 'msg msg-ai';
+      tDiv.innerHTML = '<div class="msg-label">FOMFA AI</div><div class="typing-box"><div class="typing-dots"><span class="typing-dot"></span><span class="typing-dot"></span><span class="typing-dot"></span></div><span>Mengetik...</span></div>';
+      $('messages').appendChild(tDiv);
+      $('messages').scrollTop = $('messages').scrollHeight;
+
+      const d = await api('chat', { message: txt, history: msgs.slice(0,-1), session_id: sesId });
+      
+      if (d.response) {
+        playSound('receive'); 
+        msgs.push({ role: 'assistant', content: d.response });
+      } else {
+        msgs.pop();
+        alert('Error: ' + (d.error || 'Gagal'));
+      }
+      
+      render();
+      loadHist(); 
+      procs = false;
+    }
+
+    // Fungsi Salin Pesan
+    function salinPesan(btn) {
+      const textDiv = btn.previousElementSibling;
+      const text = textDiv.innerText;
+      navigator.clipboard.writeText(text).then(() => {
+        const originalSVG = btn.innerHTML;
+        btn.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>';
+        btn.style.color = '#22c55e';
+        btn.style.opacity = '1';
+        
+        setTimeout(() => {
+          btn.innerHTML = originalSVG;
+          btn.style.color = '';
+          btn.style.opacity = '';
+        }, 1500);
+      });
+    }
+
+    function render() {
+      const c = $('messages');
+      c.innerHTML = '';
+      msgs.forEach(m => {
+        const rc = m.role === 'assistant' ? 'ai' : m.role;
+        const lbl = m.role === 'user' ? 'Anda' : 'FOMFA AI';
+        
+        c.innerHTML += `
+          <div class="msg msg-${rc}">
+            <div class="msg-label">${lbl}</div>
+            <div class="msg-text">${esc(m.content)}</div>
+            <button class="copy-btn" onclick="salinPesan(this)" title="Salin">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+              </svg>
+            </button>
+          </div>`;
+      });
+      c.scrollTop = c.scrollHeight;
+    }
+
+    function toggleSidebar(open) {
+      if(open) playSound('click');
+      $('sidebarPanel').classList.toggle('active', open);
+      $('sidebarOverlay').classList.toggle('active', open);
+    }
+
+    // === INIT ===
+    $('btnMenu').onclick = () => toggleSidebar(true);
+    $('sidebarOverlay').onclick = () => toggleSidebar(false);
+    $('btnCloseSidebar').onclick = () => toggleSidebar(false);
+    $('btnNewChat').onclick = startNewChat;
+    $('btnSend').onclick = sendMessage;
+
+    $('txtInput').onkeydown = e => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); sendMessage(); } };
+    $('txtInput').oninput = function() { this.style.height = 'auto'; this.style.height = Math.min(this.scrollHeight, 80) + 'px'; };
+
+    // Start
+    setTimeout(() => {
+      playSound('intro'); 
+      $('intro-screen').classList.add('intro-hide');
+      $('main-app').classList.add('main-visible');
+      loadHist();
+    }, 2500);
+
+  </script>
+</body>
+</html>
